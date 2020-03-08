@@ -1,5 +1,6 @@
 from influxdb import InfluxDBClient
 from datetime import datetime
+from sparklines import sparklines
 import os
 
 client = InfluxDBClient(host='localhost', port=8086)
@@ -153,3 +154,13 @@ client.write_points(ressss)
 print("DATA INSERTED TO DB")
 result = client.query('SELECT * FROM "labtest"."autogen"."devices" WHERE time > now() - 100000d GROUP BY "user"')
 print("Result: {0}".format(result))
+
+x = ["Metric 1", sparklines([1, 2, 3, 4, 5.0, 9, 3, 2, 1, 434, 341, 262, 133, 3, 2, 1, 1,2, 1, 1, 16, 22, 4, 42])]
+y = ["Metric 2", sparklines([133, 242, 421, 423, 542, 434, 341, 262, 133, 3, 2, 1, 1, 16, 22, 4, 42, 1, 2, 3, 4, 5.0, 9, 3, 2, 1])]
+z = ["Metric 3", sparklines([1, 16, 22, 4, 42, 12, 3, 133, 242, 421, 423, 542, 434, 341, 262, 133, 3, 2, 1, 1, 16, 22, 4,  12, 3, 133, 242, 421, 42, 12, 3, 2, 1])]
+metrics = [x,y,z]
+# for line in sparklines([1, 2, 3, 4, 5.0, None, 3, 2, 1], num_lines=2):
+#     print(line)
+print("Testing the sparklines for an existing metrics")
+for item in metrics:
+    print(item[0], item[1][0])
