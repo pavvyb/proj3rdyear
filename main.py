@@ -49,7 +49,7 @@ client.switch_database('labtest')
 #     }
 # ]
 
-pathh = "/home/popufey/Desktop/lab/xentop.1581649624"
+pathh = "/home/popufey/Desktop/proj3rdyear/xentop.1581649624"
 
 def convertTime(unixformat):
     standardform = datetime.utcfromtimestamp(int(unixformat.split(".")[1])).strftime('%Y-%m-%d %H:%M:%S')
@@ -115,7 +115,7 @@ def prepareObject(unprepared):
     )
     return dataRes
 
-rootFolder = "/home/popufey/Desktop/lab/fastio/"
+rootFolder = "/home/popufey/Desktop/proj3rdyear/fastio/"
 def getAllFilepaths(mypath):
     onlyfiles = [f for f in listdir(mypath) if isfile(join(mypath, f))]
     paths = []
@@ -137,9 +137,10 @@ for i in allFilepaths:
     print(toInsert)
     metricArray.append(toInsert)
     ressss = prepareObject(toInsert)
-    client.write_points(ressss)
+    # client.write_points(ressss)
     print("DATA INSERTED TO DB")
-
+xxx = input("Enter")
+print(xxx)
 # Arrays for all metrics
 metric1 = []
 metric2 = []
@@ -226,7 +227,34 @@ y = ["Metric 2", sparklines([133, 242, 421, 423, 542, 434, 341, 262, 133, 3, 2, 
 z = ["Metric 3", sparklines([1, 16, 22, 4, 42, 12, 3, 133, 242, 421, 423, 542, 434, 341, 262, 133, 3, 2, 1, 1, 16, 22, 4,  12, 3, 133, 242, 421, 42, 12, 3, 2, 1])]
 metrics = [x,y,z]
 
-
 print("Testing the sparklines for an existing metrics")
 for item in metricArray:
     print(item[0], item[1][0])
+
+
+
+while (True):
+    print('Specify the start date:')
+    startdate = input('Enter the date in the format yyyy-mm-dd (example: 2015-08-17):\n')
+    ques = ''
+    ques = input('Do you want to specify the time? [y/n]')
+    if (ques=='y'):
+        starttime = input('Enter the time in the format hh:mm:ss (example: 23:48:00):')
+    else:
+        starttime = '1:11:11'
+    print('Specify the finish date:')
+    enddate = input('Enter the date in the format yyyy-mm-dd (example: 2015-08-18):\n')
+    ques = ''
+    ques = input('Do you want to specify the time? [y/n]')
+    if (ques == 'y'):
+        endtime = input('Enter the time in the format hh:mm:ss (example: 00:54:00):')
+    else:
+        endtime = '1:11:11'
+    finalstart = startdate + 'T' + starttime + 'Z'
+    finalend = enddate + 'T' + endtime + 'Z'
+    requestbd = "SELECT * FROM labtest WHERE time >= '" + finalstart + "' AND time <= '" + finalend + "'"
+    result = client.query(requestbd)
+    for zz in result:
+        print(zz)
+    # print("Result: {0}".format(result))
+    #+ 'GROUP BY time(12m),* fill(200) LIMIT 7 SLIMIT 1'
