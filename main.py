@@ -1,5 +1,7 @@
 from influxdb import InfluxDBClient
-from datetime import datetime
+from datetime import datetime, timedelta
+
+from past.builtins import xrange
 from sparklines import sparklines
 import os
 from os import listdir
@@ -8,7 +10,7 @@ from os.path import isfile, join
 client = InfluxDBClient(host='localhost', port=8086)
 client.create_database('newtest')
 dbaselist = client.get_list_database()
-print("Databases:", dbaselist)
+# print("Databases:", dbaselist)
 client.switch_database('newtest')
 
 pathh = "/home/popufey/Desktop/proj3rdyear/xentop.1581649624"
@@ -88,26 +90,50 @@ def getAllFilepaths(mypath):
     return paths
 
 allFilepaths = getAllFilepaths(rootFolder)
-print("FILES", allFilepaths)
+# print("FILES", allFilepaths)
 
 metricArray = []
 
 # Extracting data from all filepaths in the directory
 for i in allFilepaths:
     toInsert = extractData(i)
-    print("to insert")
-    print(toInsert)
+    # print("to insert")
+    # print(toInsert)
     metricArray.append(toInsert)
     ressss = prepareObject(toInsert)
-    print(ressss)
+    # print(ressss)
     client.write_points(ressss)
-    print("DATA INSERTED TO DB")
+    # print("DATA INSERTED TO DB")
 
 
 x = ["Metric 1", sparklines([1, 2, 3, 4, 5.0, 9, 3, 2, 1, 434, 341, 262, 133, 3, 2, 1, 1,2, 1, 1, 16, 22, 4, 42])]
 y = ["Metric 2", sparklines([133, 242, 421, 423, 542, 434, 341, 262, 133, 3, 2, 1, 1, 16, 22, 4, 42, 1, 2, 3, 4, 5.0, 9, 3, 2, 1])]
 z = ["Metric 3", sparklines([1, 16, 22, 4, 42, 12, 3, 133, 242, 421, 423, 542, 434, 341, 262, 133, 3, 2, 1, 1, 16, 22, 4,  12, 3, 133, 242, 421, 42, 12, 3, 2, 1])]
 metrics = [x,y,z]
+
+
+def makeEndingTime(dayt, taim, intrv):
+    reslt = ''
+    ddtt = dayt + ' ' + taim + '.000000'
+    dtobj = datetime.strptime(ddtt, '%Y-%m-%d %H:%M:%S.%f')
+    inputs = intrv.split(' ')
+    valoption = inputs[1]
+    valvalue = inputs[0]
+
+    if (valoption=='sec'):
+        reslt = dtobj + timedelta(seconds=int(valvalue))
+    elif (valoption=='min'):
+        reslt = dtobj + timedelta(minutes=int(valvalue))
+    elif (valoption=='hrs'):
+        reslt = dtobj + timedelta(hours=int(valvalue))
+
+    reslt = reslt.strftime('%Y-%m-%d %H:%M:%S')
+    reslt = reslt.split(' ')
+    reslt = reslt[0]+'T'+reslt[1]+'Z'
+
+    return reslt
+
+
 
 def findMin(inpArr):
     mini = inpArr[0]
@@ -181,6 +207,73 @@ def makeSparksNew(inpArr):
     metric16 = correctMin(metric16)
     metric17 = correctMin(metric17)
 
+    if (len(metric1) > 140):
+        while (len(metric1) > 140):
+            del metric1[0]
+
+    if (len(metric2)>140):
+        while (len(metric2)>140):
+            del metric2[0]
+
+    if (len(metric3)>140):
+        while (len(metric3)>140):
+            del metric3[0]
+
+    if (len(metric4)>140):
+        while (len(metric4)>140):
+            del metric4[0]
+
+    if (len(metric5)>140):
+        while (len(metric5)>140):
+            del metric5[0]
+
+    if (len(metric6)>140):
+        while (len(metric6)>140):
+            del metric6[0]
+
+    if (len(metric7)>140):
+        while (len(metric7)>140):
+            del metric7[0]
+
+    if (len(metric8)>140):
+        while (len(metric8)>140):
+            del metric8[0]
+
+    if (len(metric9)>140):
+        while (len(metric9)>140):
+            del metric9[0]
+
+    if (len(metric10)>140):
+        while (len(metric10)>140):
+            del metric10[0]
+
+    if (len(metric11)>140):
+        while (len(metric11)>140):
+            del metric11[0]
+
+    if (len(metric12)>140):
+        while (len(metric12)>140):
+            del metric12[0]
+
+    if (len(metric13)>140):
+        while (len(metric13)>140):
+            del metric13[0]
+
+    if (len(metric14)>140):
+        while (len(metric14)>140):
+            del metric14[0]
+
+    if (len(metric15)>140):
+        while (len(metric15)>140):
+            del metric15[0]
+
+    if (len(metric16)>140):
+        while (len(metric16)>140):
+            del metric16[0]
+
+    if (len(metric17)>140):
+        while (len(metric17)>140):
+            del metric17[0]
 
     # Final arrays for metrics
     finalmetric1 = ["CPUsec", sparklines(metric1)]
@@ -224,39 +317,85 @@ def makeSparksNew(inpArr):
     return outpArr
 
 while (True):
-    print('Specify the start date:')
-    startdate = input('Enter the date in the format yyyy-mm-dd (example: 2015-08-17):\n')
-    ques = ''
-    ques = input('Do you want to specify the time? [y/n]')
-    if (ques=='y'):
-        starttime = input('Enter the time in the format hh:mm:ss (example: 23:48:00):')
-    else:
-        starttime = '1:11:11'
-    print('Specify the finish date:')
-    enddate = input('Enter the date in the format yyyy-mm-dd (example: 2015-08-18):\n')
-    ques = ''
-    ques = input('Do you want to specify the time? [y/n]')
-    if (ques == 'y'):
-        endtime = input('Enter the time in the format hh:mm:ss (example: 00:54:00):')
-    else:
-        endtime = '1:11:11'
-    finalstart = startdate + 'T' + starttime + 'Z'
-    finalend = enddate + 'T' + endtime + 'Z'
-    finalend = "'"+finalend+"'"
-    finalstart = "'"+finalstart+"'"
-    requestbd = 'SELECT * FROM "newtest"."autogen"."devices" WHERE time >= '+ finalstart + ' AND time <= ' + finalend + 'ORDER BY time ASC'
-    # result = client.query('SELECT * FROM "newtest"."autogen"."devices" WHERE time > now() - 100000d GROUP BY "user"')
-    result = client.query(requestbd)
-    resultset = []
-    print(requestbd)
-    for qus in result:
-        for qq in qus:
-            resultset.append(qq)
-    # for finn in resultset:
-    #     print(finn)
-    answerArray = makeSparksNew(resultset)
+    chois = 'noo'
+
+    print('Choose one of the following options:')
+    print('1. Specify the exact time [example: from 11-01-2001 18:45:54 to 01-02-2003 13:47:28]')
+    print('2. Specify the time of the start and time period [example: from 11-01-2001 18:45:54 for 15 min]')
+
+    while (chois=='noo'):
+        chois = input('Type 1 or 2:')
 
 
-    print("The Sparklines for this timeframe:")
-    for item in answerArray:
-        print(item[0], item[1][0])
+
+    if (chois=='2'):
+        print('Specify the start date:')
+        startdate = input('Enter the date in the format yyyy-mm-dd (example: 2015-08-17):\n')
+        starttime = input('Enter the time in the format hh:mm:ss (example: 18:45:54):')
+        finalstart = "'" + startdate + 'T' + starttime + 'Z' + "'"
+
+
+        print('Choose one of the following time periods:')
+        timeper = input('Type the time period in the format 7 sec/10 min/3 hrs')
+        temmmmp = timeper.split(' ')
+        mainstf = temmmmp[1]
+        colichvo = temmmmp[0]
+
+        finalend = "'" + makeEndingTime(startdate, starttime, timeper) + "'"
+
+        #requestbd = 'SELECT * FROM "newtest"."autogen"."devices" WHERE time >= ' + finalstart + ' AND time <= ' + finalend + 'ORDER BY time ASC'
+        requestbd = 'SELECT * FROM "newtest"."autogen"."devices" WHERE time >= ' + finalstart + ' AND time <= ' + finalend + ' ORDER BY time ASC'
+        print(requestbd)
+
+        result = client.query(requestbd)
+        resultset = []
+        print(requestbd)
+        for qus in result:
+            for qq in qus:
+                resultset.append(qq)
+        answerArray = makeSparksNew(resultset)
+
+        print("The Sparklines for this timeframe:")
+        for item in answerArray:
+            print('\n', item[0], '\n', item[1][0])
+
+
+
+    if (chois=='1'):
+        print('Specify the start date:')
+        startdate = input('Enter the date in the format yyyy-mm-dd (example: 2015-08-17):\n')
+        ques = ''
+        ques = input('Do you want to specify the time? [y/n]')
+        if (ques=='y'):
+            starttime = input('Enter the time in the format hh:mm:ss (example: 23:48:00):')
+        else:
+            starttime = '1:11:11'
+        print('Specify the finish date:')
+        enddate = input('Enter the date in the format yyyy-mm-dd (example: 2015-08-18):\n')
+        ques = ''
+        ques = input('Do you want to specify the time? [y/n]')
+        if (ques == 'y'):
+            endtime = input('Enter the time in the format hh:mm:ss (example: 00:54:00):')
+        else:
+            endtime = '1:11:11'
+        finalstart = startdate + 'T' + starttime + 'Z'
+        finalend = enddate + 'T' + endtime + 'Z'
+        finalend = "'"+finalend+"'"
+        finalstart = "'"+finalstart+"'"
+        requestbd = 'SELECT * FROM "newtest"."autogen"."devices" WHERE time >= '+ finalstart + ' AND time <= ' + finalend + 'ORDER BY time ASC'
+        # result = client.query('SELECT * FROM "newtest"."autogen"."devices" WHERE time > now() - 100000d GROUP BY "user"')
+        result = client.query(requestbd)
+        resultset = []
+        print(requestbd)
+        for qus in result:
+            for qq in qus:
+                resultset.append(qq)
+        # for finn in resultset:
+        #     print(finn)
+        answerArray = makeSparksNew(resultset)
+
+
+        print("The Sparklines for this timeframe:")
+        for item in answerArray:
+            print('\n', item[0], '\n', item[1][0])
+
